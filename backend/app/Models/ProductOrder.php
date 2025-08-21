@@ -12,8 +12,8 @@ class ProductOrder extends Model
     /** @use HasFactory<\Database\Factories\ProductOrderFactory> */
     use HasFactory;
 
-    public function customer(): BelongsTo {
-        return $this->belongsTo(User::class, 'customer_id');
+    public function customer(): HasOne {
+        return $this->hasOne(User::class, 'id', 'customer_id');
     }
 
     public function product(): HasOne {
