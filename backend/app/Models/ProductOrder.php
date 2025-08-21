@@ -12,6 +12,8 @@ class ProductOrder extends Model
     /** @use HasFactory<\Database\Factories\ProductOrderFactory> */
     use HasFactory;
 
+    protected $fillable = ['product_id', 'customer_id', 'quantity'];
+
     public function customer(): HasOne {
         return $this->hasOne(User::class, 'id', 'customer_id');
     }
