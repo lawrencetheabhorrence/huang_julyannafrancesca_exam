@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use http\Env\Response;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductController extends Controller
 {
@@ -13,15 +15,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json(Product::all());
     }
 
     /**
@@ -29,38 +23,46 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        //
+        $product = Product::create($request->validated());
+        return response()->json($product);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
-    {
-        //
+        try {
+           $product = Product::findOrFail($id);
+           return response()->json($product);
+        } catch (\Throwable $th) {
+            return response()->status(204);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, $id)
     {
-        //
+        try {
+            $product = Product::findOrFail($id);
+            $product->update($request->validated());
+            return response()->json($product);
+        } catch (ModelNotFoundException $e) {
+            return response()->status(204);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        //
+        try {
+            Product::destroy($id);
+        } catch (\Throwable $th) {
+            return response()->status(204);
+        }
     }
 }
