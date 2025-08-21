@@ -26,11 +26,7 @@ class ProductOrderController extends Controller
      */
     public function store(StoreProductOrderRequest $request)
     {
-        $payload = $request->validated();
-        $productOrder = new ProductOrder();
-        // TODO: Write errors for failing to find product/customer
-        $productOrder->product()->findOrFail($payload['product_id']);
-        $productOrder->customer()->findOrFail($payload['customer_id']);
+        $productOrder = ProductOrder::create($request->validated());
         return response()->json($productOrder);
     }
 
@@ -43,7 +39,7 @@ class ProductOrderController extends Controller
             $productOrder = ProductOrder::findOrFail($id);
             return response()->json($productOrder);
         } catch (ModelNotFoundException $e) {
-            return response()->status(204);
+            return abort(404);
         }
     }
 
@@ -57,7 +53,7 @@ class ProductOrderController extends Controller
             $productOrder->update($request->validated());
             return response()->json($productOrder);
         } catch (ModelNotFoundException $e) {
-            return response()->status(204);
+            return abort(404);
         }
     }
 
@@ -69,7 +65,7 @@ class ProductOrderController extends Controller
         try {
             ProductOrder::destroy($id);
         } catch (ModelNotFoundException $e) {
-            return response()->status(204);
+            return abort(404);
         }
     }
 }

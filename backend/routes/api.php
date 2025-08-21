@@ -19,6 +19,7 @@ Route::prefix('product')->group(function(){
 
 Route::prefix('order')->group(function(){
     Route::get('/', [ProductOrderController::class, 'index']);
+    Route::get('/customer/{customer_id}', [ProductOrderController::class, 'listFromCustomer']);
     Route::post('/', [ProductOrderController::class, 'store']);
     Route::get('/{id}', [ProductOrderController::class, 'show']);
     Route::put('/{id}', [ProductOrderController::class, 'update']);
