@@ -24,11 +24,15 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        if (is_null($request->user()) || $request->user()->cannot('create', Product::class)) {
-            abort(403);
+        $user = $request->user();
+        if (is_null($user)) {
+            return response()->json(["error" => "Unauthorized"], 401);
         }
-        $product = Product::create($request->validated());
-        return response()->json($product);
+
+        if ($user->can('create', Product::class) || $user->tokenCan('product:modify')) {
+            $product = Product::create($request->validated());
+            return response()->json($product);
+        }
     }
 
     public function makeOrder(Product $product, ProductOrder $productOrder) {
@@ -62,9 +66,11 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, $id)
     {
-        if (is_null($request->user()) || $request->user()->cannot('update', Product::class)) {
-            abort(403);
+        $user = $request->user();
+        if (is_null($user) || !($user->tokenCan('product:modify'))) {
+            return response()->json(["error" => "Unauthorized"], 401);
         }
+
         try {
             $product = Product::findOrFail($id);
             $product->update($request->validated());
