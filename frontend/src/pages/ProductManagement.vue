@@ -20,6 +20,7 @@
           <q-btn text-color="black" icon="delete" />
         </q-btn-group>
       </section>
+
     </section>
   </main>
 </template>
