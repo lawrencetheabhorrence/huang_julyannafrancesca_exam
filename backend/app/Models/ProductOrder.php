@@ -13,6 +13,9 @@ class ProductOrder extends Model
     use HasFactory;
 
     protected $fillable = ['product_id', 'customer_id', 'quantity'];
+    protected $attributes = [
+        'is_committed' => false,
+    ];
 
     public function customer(): HasOne {
         return $this->hasOne(User::class, 'id', 'customer_id');

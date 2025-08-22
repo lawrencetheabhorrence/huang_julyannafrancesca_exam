@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductOrderRequest;
 use App\Http\Requests\UpdateProductOrderRequest;
+use App\Models\Product;
 use App\Models\ProductOrder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -26,8 +27,29 @@ class ProductOrderController extends Controller
      */
     public function store(StoreProductOrderRequest $request)
     {
-        $productOrder = ProductOrder::create($request->validated());
+        if (is_null($request->user())) {
+            return response()->json(null, 401);
+        }
+        $payload = $request->validated();
+        $product = Product::find($payload['product_id']);
+        if ($product->quantity <= 0) {
+            return response()->json(['error' => "Out of stock"]);
+        }
+        if ($product->quantity < $payload['quantity']) {
+            return response()->json(['error' => "Insufficient stock"], 400);
+        }
+        $productOrder = ProductOrder::create($payload);
         return response()->json($productOrder);
+    }
+
+    public function commitOrder($id) {
+        try {
+            $productOrder = ProductOrder::findOrFail($id);
+            $product = Product::findOrFail($productOrder->product_id);
+            ProductController::class->makeOrder($product, $productOrder);
+        } catch (ModelNotFoundException $e) {
+            abort(404);
+        }
     }
 
     /**
