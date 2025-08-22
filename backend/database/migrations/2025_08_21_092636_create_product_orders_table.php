@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->integer('quantity');
+            $table->boolean('is_committed')->default(false);
             $table->foreignId('customer_id');
 
             $table->foreign('customer_id')->references('id')->on('users');
